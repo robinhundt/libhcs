@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(libhcs)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ".cmake")
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/.cmake)
 
 execute_process(COMMAND ${CMAKE_C_COMPILER} -v)
 find_package(GMP REQUIRED)

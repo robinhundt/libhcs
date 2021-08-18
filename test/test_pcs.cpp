@@ -3,6 +3,7 @@
 
 #include <gmpxx.h>
 #include "../include/libhcs++/pcs.hpp"
+#include "../include/libhcs++/pcs_t.hpp"
 
 static hcs::random *hr;
 static hcs::pcs::public_key *pk;

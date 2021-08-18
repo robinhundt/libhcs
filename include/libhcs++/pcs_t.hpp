@@ -22,6 +22,7 @@
 #include <vector>
 #include <gmpxx.h>
 #include "../libhcs/pcs_t.h"
+#include "hcs_shares.hpp"
 #include "random.hpp"
 
 namespace hcs {
@@ -87,9 +88,9 @@ public:
     // May want to make a new object which holds shares, given there are a
     // number of specific operations that are useful to do on them, plus
     // they require a set size and we can enforce that through some function
-    mpz_class share_combine(std::vector<mpz_t> &shares) {
+    mpz_class share_combine(hcs::shares &shares) {
         mpz_class rop;
-        pcs_t_share_combine(pk, rop.get_mpz_t(), shares.data());
+        pcs_t_share_combine(pk, rop.get_mpz_t(), shares.as_ptr());
         return rop;
     }
 
@@ -132,20 +133,8 @@ public:
         return hr;
     }
 
-    void decrypt(mpz_class &rop, mpz_class &c1) {
-        //pcs_t_decrypt(vk, rop.get_mpz_t(), c1.get_mpz_t());
-    }
-
     void clear() {
         pcs_t_clear_private_key(vk);
-    }
-
-    std::string export_json() {
-        //return std::string(pcs_t_export_private_key(vk));
-    }
-
-    int import_json(std::string &json) {
-        //return pcs_t_import_private_key(vk, json.c_str());
     }
 };
 

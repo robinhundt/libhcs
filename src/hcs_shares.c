@@ -8,15 +8,21 @@ hcs_shares* hcs_init_shares(unsigned long size)
 {
     hcs_shares *hs = malloc(sizeof(hcs_shares));
     if (!hs)
-        goto failure;
+        return NULL;
 
     hs->shares = malloc(sizeof(mpz_t) * size);
-    if (!hs->shares)
-        goto failure;
+    if (!hs->shares) {
+        free(hs);
+        return NULL;
+    }
+
 
     hs->flag = malloc(sizeof(int) * size);
-    if (!hs->flag)
-        goto failure;
+    if (!hs->flag) {
+        free(hs->shares);
+        free(hs);
+        return NULL;
+    }
 
     hs->size = size;
 
@@ -24,16 +30,6 @@ hcs_shares* hcs_init_shares(unsigned long size)
         mpz_init(hs->shares[i]);
 
     return hs;
-
-failure:
-    if (hs->flag)
-        free(hs->flag);
-    if (hs->shares)
-        free(hs->shares);
-    if (hs)
-        free(hs);
-
-    return NULL;
 }
 
 void hcs_set_share(hcs_shares *hs, mpz_t share_value, unsigned long share_id)
