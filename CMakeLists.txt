@@ -39,6 +39,7 @@ target_link_libraries(${LIBRARY_NAME} ${GMP_LIBRARIES})
 # BEGIN: Install commands
 install(DIRECTORY ${LIBRARY_DIR} DESTINATION lib USE_SOURCE_PERMISSIONS)
 install(DIRECTORY ${INCLUDE_DIR} DESTINATION include)
+install(TARGETS ${LIBRARY_NAME} EXPORT ${LIBRARY_NAME}Targets LIBRARY PUBLIC_HEADER)
 # END: Install commands
 
 # BEGIN: Test commands
