@@ -41,9 +41,19 @@ public:
         hr->inc_refcount();
     }
 
+    // delete copy constructor because it can result in double free
+    public_key(const public_key&) = delete;
+
+    public_key(public_key&& other): pk(other.pk), hr(other.hr) {
+        other.pk = nullptr;
+        other.hr = nullptr;
+    }
+
     ~public_key() {
-        pcs_t_free_public_key(pk);
-        hr->dec_refcount();
+        if (pk != nullptr) {
+            pcs_t_free_public_key(pk);
+            hr->dec_refcount();
+        }
     }
 
     pcs_t_public_key* as_ptr() {
@@ -120,9 +130,19 @@ public:
         hr->inc_refcount();
     }
 
+    // delete copy constructor because it can result in double free
+    private_key(const private_key&) = delete;
+
+    private_key(private_key&& other): vk(other.vk), hr(other.hr) {
+        other.vk = nullptr;
+        other.hr = nullptr;
+    }
+
     ~private_key() {
-        pcs_t_free_private_key(vk);
-        hr->dec_refcount();
+        if (vk != nullptr) {
+            pcs_t_free_private_key(vk);
+            hr->dec_refcount();
+        }
     }
 
     pcs_t_private_key* as_ptr() {
@@ -151,9 +171,19 @@ public:
         hr->inc_refcount();
     }
 
+    // delete copy constructor because it can result in double free
+    polynomial(const polynomial&) = delete;
+
+    polynomial(polynomial&& other): px(other.px), hr(other.hr) {
+        other.px = nullptr;
+        other.hr = nullptr;
+    }
+
     ~polynomial() {
-        pcs_t_free_polynomial(px);
-        hr->dec_refcount();
+        if (px != nullptr) {
+            pcs_t_free_polynomial(px);
+            hr->dec_refcount();
+        }
     }
 
     pcs_t_polynomial* as_ptr() {
@@ -182,8 +212,17 @@ public:
         pcs_t_set_auth_server(au, op.get_mpz_t(), id);
     }
 
+    // delete copy constructor because it can result in double free
+    auth_server(const auth_server&) = delete;
+
+    auth_server(auth_server&& other): au(other.au) {
+        other.au = nullptr;
+    }
+
     ~auth_server() {
-        pcs_t_free_auth_server(au);
+        if (au != nullptr) {
+            pcs_t_free_auth_server(au);
+        }
     }
 
     pcs_t_auth_server *as_ptr() {

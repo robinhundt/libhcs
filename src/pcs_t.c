@@ -14,8 +14,6 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <gmp.h>
 
 #include "../include/libhcs/hcs_random.h"
