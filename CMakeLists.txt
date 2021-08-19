@@ -1,56 +1,73 @@
-cmake_minimum_required(VERSION 2.8)
-project(libhcs)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/.cmake)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-execute_process(COMMAND ${CMAKE_C_COMPILER} -v)
-find_package(GMP REQUIRED)
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CXXMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+# ---- Project ----
+
+# Note: update this to your new project's name and version
+project(
+  hcs
+  VERSION 1.0
+  LANGUAGES C CXX
+)
+
+# ---- Include guards ----
+
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+  message(
+    FATAL_ERROR
+      "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
+  )
 endif()
 
-set(LIBRARY_NAME "hcs")
-set(LIBRARY_DIR "lib/")
-set(INCLUDE_DIR "include/")
-set(SOURCE_DIR  "src/")
-set(TEST_DIR    "test/")
-set(BINARY_DIR  "bin/")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIBRARY_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_DIR})
+# ---- Add dependencies via CPM ----
+# see https://github.com/TheLartians/CPM.cmake for more info
 
-# BEGIN: Project configuration
-file(GLOB srcs "src/*.c" "src/com/*.c")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -Wextra -std=c99")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
+include(cmake/CPM.cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-include(TestBigEndian)
-test_big_endian(IsBigEndian)
-if (${IsBigEndian})
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHCS_BIG_ENDIAN")
-endif (${IsBigEndian})
-# END: Project configuration
+# PackageProject.cmake will be used to make our target installable
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 
-# BEGIN: Build commands
-add_library(${LIBRARY_NAME} STATIC ${srcs})
-target_link_libraries(${LIBRARY_NAME} ${GMP_LIBRARIES})
-# END: Build commands
+# ---- Add source files ----
 
-# BEGIN: Install commands
-install(DIRECTORY ${LIBRARY_DIR} DESTINATION lib USE_SOURCE_PERMISSIONS)
-install(DIRECTORY ${INCLUDE_DIR} DESTINATION include)
-install(TARGETS ${LIBRARY_NAME} EXPORT ${LIBRARY_NAME}Targets LIBRARY PUBLIC_HEADER)
-# END: Install commands
+# Note: globbing sources is considered bad practice as CMake's generators may not detect new files
+# automatically. Keep that in mind when changing files, or explicitly mention them here.
+file(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp")
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 
-# BEGIN: Test commands
-enable_testing()
-set(CMAKE_CTEST_COMMAND "${CMAKE_CTEST_COMMAND} --verbose")
+# ---- Create library ----
 
-file(GLOB test_srcs "${TEST_DIR}/*.cpp")
-foreach(f ${test_srcs})
-    get_filename_component(test_prog ${f} NAME_WE)
-    add_executable(${test_prog} "${TEST_DIR}/${test_prog}.cpp")
-    target_link_libraries(${test_prog} hcs ${GMP_LIBRARIES} ${GMPXX_LIBRARIES})
-    add_test(${test_prog} "${BINARY_DIR}/${test_prog}")
-endforeach()
-# EN: Test commands
+# Note: for header-only libraries change all PUBLIC flags to INTERFACE and create an interface
+# target: add_library(kthRank INTERFACE)
+add_library(hcs ${headers} ${sources})
+
+set_target_properties(hcs PROPERTIES CXX_STANDARD 20 )
+
+# being a cross-platform target, we enforce standards conformance on MSVC
+target_compile_options(hcs PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->")
+
+# Link dependencies
+target_link_libraries(hcs PRIVATE gmp gmpxx)
+
+target_include_directories(
+  hcs PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                 $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
+)
+
+# ---- Create an installable target ----
+# this allows users to install and find the library via `find_package()`.
+
+# the location where the project's version header will be placed should match the project's regular
+# header paths
+string(TOLOWER kth-rank/version.h VERSION_HEADER_LOCATION)
+
+packageProject(
+  NAME ${PROJECT_NAME}
+  VERSION ${PROJECT_VERSION}
+  NAMESPACE ${PROJECT_NAME}
+  BINARY_DIR ${PROJECT_BINARY_DIR}
+  INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include
+  INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+  VERSION_HEADER "${VERSION_HEADER_LOCATION}"
+  COMPATIBILITY SameMajorVersion
+  DEPENDENCIES "gmp"
+)
