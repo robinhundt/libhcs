@@ -18,10 +18,24 @@ public:
     * @param size The number of shares this hcs::shares should store
     * @return A an initialized hcs::shares object.
     */
-    shares(unsigned long size): hs(hcs_init_shares(size)) {};
+    explicit shares(unsigned long size): hs(hcs_init_shares(size)) {};
+
+    explicit shares(std::vector<mpz_class>&& shares_vec): shares(shares_vec.size()) {
+        for (std::size_t i = 0; i < shares_vec.size(); ++i) {
+            this->set_share(shares_vec[i], i);
+        }
+    }
+
+    shares(const shares&) = delete;
+
+    shares(shares&& other) noexcept : hs(other.hs) {
+        other.hs = nullptr;
+    }
 
     ~shares() {
-        hcs_free_shares(this->hs);
+        if (hs != nullptr) {
+            hcs_free_shares(this->hs);
+        }
     }
 
 

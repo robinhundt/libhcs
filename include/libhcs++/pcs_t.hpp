@@ -18,7 +18,6 @@
 #ifndef HCS_PCS_T_HPP
 #define HCS_PCS_T_HPP
 
-#include <string>
 #include <vector>
 #include <gmpxx.h>
 #include "../libhcs/pcs_t.h"
@@ -35,7 +34,7 @@ private:
     hcs::random *hr;
 
 public:
-    public_key(hcs::random &hr_) {
+    explicit public_key(hcs::random &hr_) {
         pk = pcs_t_init_public_key();
         hr = &hr_;
         hr->inc_refcount();
@@ -44,7 +43,7 @@ public:
     // delete copy constructor because it can result in double free
     public_key(const public_key&) = delete;
 
-    public_key(public_key&& other): pk(other.pk), hr(other.hr) {
+    public_key(public_key&& other) noexcept : pk(other.pk), hr(other.hr) {
         other.pk = nullptr;
         other.hr = nullptr;
     }
@@ -107,14 +106,6 @@ public:
     void clear() {
         pcs_t_clear_public_key(pk);
     }
-
-    std::string export_json() {
-        return std::string(pcs_t_export_public_key(pk));
-    }
-
-    int import_json(std::string &json) {
-        return pcs_t_import_public_key(pk, json.c_str());
-    }
 };
 
 class private_key {
@@ -124,7 +115,7 @@ private:
     hcs::random *hr;
 
 public:
-    private_key(hcs::random &hr_) {
+    explicit private_key(hcs::random &hr_) {
         vk = pcs_t_init_private_key();
         hr = &hr_;
         hr->inc_refcount();
@@ -133,7 +124,7 @@ public:
     // delete copy constructor because it can result in double free
     private_key(const private_key&) = delete;
 
-    private_key(private_key&& other): vk(other.vk), hr(other.hr) {
+    private_key(private_key&& other) noexcept : vk(other.vk), hr(other.hr) {
         other.vk = nullptr;
         other.hr = nullptr;
     }
@@ -165,7 +156,7 @@ private:
     hcs::random *hr;
 
 public:
-    polynomial(hcs::pcs_t::private_key &pk) {
+    explicit polynomial(hcs::pcs_t::private_key &pk) {
         hr = pk.get_rand();
         px = pcs_t_init_polynomial(pk.as_ptr(), hr->as_ptr());
         hr->inc_refcount();
@@ -174,7 +165,7 @@ public:
     // delete copy constructor because it can result in double free
     polynomial(const polynomial&) = delete;
 
-    polynomial(polynomial&& other): px(other.px), hr(other.hr) {
+    polynomial(polynomial&& other) noexcept : px(other.px), hr(other.hr) {
         other.px = nullptr;
         other.hr = nullptr;
     }
@@ -215,7 +206,7 @@ public:
     // delete copy constructor because it can result in double free
     auth_server(const auth_server&) = delete;
 
-    auth_server(auth_server&& other): au(other.au) {
+    auth_server(auth_server&& other) noexcept : au(other.au) {
         other.au = nullptr;
     }
 
@@ -234,14 +225,6 @@ public:
         pcs_t_share_decrypt(pk.as_ptr(), au, rop.get_mpz_t(),
                 cipher1.get_mpz_t());
         return rop;
-    }
-
-    std::string export_json() {
-        return std::string(pcs_t_export_auth_server(au));
-    }
-
-    void import_json(std::string &json) {
-        pcs_t_import_auth_server(au, json.c_str());
     }
 };
 
