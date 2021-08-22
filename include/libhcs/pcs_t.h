@@ -19,6 +19,7 @@
 #define HCS_PCS_T_H
 
 #include <gmp.h>
+
 #include "hcs_random.h"
 #include "hcs_shares.h"
 
@@ -32,28 +33,28 @@ extern "C" {
  * variants, and even the single value versions.
  */
 typedef struct {
-    mpz_t e[2];         /**< Internal proof verification fields */
-    mpz_t a[2];         /**< Internal proof verification fields */
-    mpz_t z[2];         /**< Internal proof verification fields */
-    unsigned long m1;   /**< Value of first power for 1of2 protocol */
-    unsigned long m2;   /**< Value of second power for 1of2 protocol */
-    mpz_t generator;    /**< Value of generator (base) in 1of2 protocol */
+  mpz_t e[2];       /**< Internal proof verification fields */
+  mpz_t a[2];       /**< Internal proof verification fields */
+  mpz_t z[2];       /**< Internal proof verification fields */
+  unsigned long m1; /**< Value of first power for 1of2 protocol */
+  unsigned long m2; /**< Value of second power for 1of2 protocol */
+  mpz_t generator;  /**< Value of generator (base) in 1of2 protocol */
 } pcs_t_proof;
 
 /**
  * Details of the polynomial used to compute values for decryption servers.
  */
 typedef struct {
-    unsigned long n;    /**< The number of terms in the polynomial */
-    mpz_t *coeff;       /**< Coefficients of the polynomial */
+  unsigned long n; /**< The number of terms in the polynomial */
+  mpz_t *coeff;    /**< Coefficients of the polynomial */
 } pcs_t_polynomial;
 
 /**
  * Details that a decryption server is required to keep track of.
  */
 typedef struct {
-    unsigned long i;    /**< The server index in the particular instance */
-    mpz_t si;           /**< The polynomial evaluation at @p i */
+  unsigned long i; /**< The server index in the particular instance */
+  mpz_t si;        /**< The polynomial evaluation at @p i */
 } pcs_t_auth_server;
 
 /**
@@ -62,12 +63,12 @@ typedef struct {
  * authorization servers.
  */
 typedef struct {
-    unsigned long w; /**< The number of servers req to successfully decrypt */
-    unsigned long l; /**< The number of decryption servers */
-    mpz_t n;         /**< Modulus of the key. n = p * q */
-    mpz_t g;         /**< Precomputation: n + 1 */
-    mpz_t n2;        /**< Precomputation: n^2 */
-    mpz_t delta;     /**< Precomputation: l! */
+  unsigned long w; /**< The number of servers req to successfully decrypt */
+  unsigned long l; /**< The number of decryption servers */
+  mpz_t n;         /**< Modulus of the key. n = p * q */
+  mpz_t g;         /**< Precomputation: n + 1 */
+  mpz_t n2;        /**< Precomputation: n^2 */
+  mpz_t delta;     /**< Precomputation: l! */
 } pcs_t_public_key;
 
 /**
@@ -78,14 +79,14 @@ typedef struct {
  * destroy this key as it will not be required again.
  */
 typedef struct {
-    unsigned long w; /**< The number of servers req to decrypt */
-    unsigned long l; /**< The number of decryption servers in total */
-    mpz_t *vi;       /**< Verification values for the decryption servers */
-    mpz_t v;         /**< Cyclic generator of squares in Z*n^2 */
-    mpz_t d;         /**< d = 0 mod m and d = 1 mod n^2 */
-    mpz_t n;         /**< Modulus of the key: p * q */
-    mpz_t n2;        /**< Precomputation: n^2 */
-    mpz_t nm;        /**< Precomputation: n * m */
+  unsigned long w; /**< The number of servers req to decrypt */
+  unsigned long l; /**< The number of decryption servers in total */
+  mpz_t *vi;       /**< Verification values for the decryption servers */
+  mpz_t v;         /**< Cyclic generator of squares in Z*n^2 */
+  mpz_t d;         /**< d = 0 mod m and d = 1 mod n^2 */
+  mpz_t n;         /**< Modulus of the key: p * q */
+  mpz_t n2;        /**< Precomputation: n^2 */
+  mpz_t nm;        /**< Precomputation: n * m */
 } pcs_t_private_key;
 
 /**
@@ -95,7 +96,7 @@ typedef struct {
  * @return A pointer to an initialised pcs_t_public_key, NULL on allocation
  *         failure
  */
-pcs_t_public_key* pcs_t_init_public_key(void);
+pcs_t_public_key *pcs_t_init_public_key(void);
 
 /**
  * Initialise a pcs_t_private_key and return a pointer to the newly created
@@ -104,7 +105,7 @@ pcs_t_public_key* pcs_t_init_public_key(void);
  * @return A pointer to an initialised pcs_t_private_key, NULL on allocation
  *         failure
  */
-pcs_t_private_key* pcs_t_init_private_key(void);
+pcs_t_private_key *pcs_t_init_private_key(void);
 
 /**
  * Initialise a key pair with modulus size @p bits. It is required that @p pk
@@ -139,9 +140,8 @@ pcs_t_private_key* pcs_t_init_private_key(void);
  * @param w The number of servers in total
  * @return non-zero on success, zero on allocation failure
  */
-int pcs_t_generate_key_pair(pcs_t_public_key *pk, pcs_t_private_key *vk,
-        hcs_random *hr, const unsigned long bits, const unsigned long l,
-        const unsigned long w);
+int pcs_t_generate_key_pair(pcs_t_public_key *pk, pcs_t_private_key *vk, hcs_random *hr,
+                            const unsigned long bits, const unsigned long l, const unsigned long w);
 
 /**
  * Encrypt a value @p plain1, and set @p rop to the encryted result. This
@@ -168,8 +168,7 @@ void pcs_t_encrypt_r(pcs_t_public_key *pk, mpz_t rop, mpz_t r, mpz_t plain1);
  * @param rop mpz_t where the encrypted result is stored
  * @param plain1 mpz_t to be encrypted
  */
-void pcs_t_r_encrypt(pcs_t_public_key *pk, hcs_random *hr,
-        mpz_t r, mpz_t rop, mpz_t plain1);
+void pcs_t_r_encrypt(pcs_t_public_key *pk, hcs_random *hr, mpz_t r, mpz_t rop, mpz_t plain1);
 
 /**
  * Encrypt a value @p plain1, and set @p rop to the encrypted result.
@@ -231,7 +230,7 @@ void pcs_t_ep_mul(pcs_t_public_key *pk, mpz_t rop, mpz_t cipher1, mpz_t plain1);
  *
  * @return A zero-initialised pcs_t_proof object
  */
-pcs_t_proof* pcs_t_init_proof(void);
+pcs_t_proof *pcs_t_init_proof(void);
 
 /**
  * Set a proof object's value to check for.
@@ -241,8 +240,7 @@ pcs_t_proof* pcs_t_init_proof(void);
  * @param m1 First power that this proof will allow
  * @param m2 Second power that this proof will allow
  */
-void pcs_t_set_proof(pcs_t_proof *pf, mpz_t generator, unsigned long m1,
-        unsigned long m2);
+void pcs_t_set_proof(pcs_t_proof *pf, mpz_t generator, unsigned long m1, unsigned long m2);
 
 /**
  * Compute a proof for a particular value @p ciper_m, and an @p id. @p cipher_m
@@ -261,9 +259,9 @@ void pcs_t_set_proof(pcs_t_proof *pf, mpz_t generator, unsigned long m1,
  * @param nth_power The power that this encrypted value represents
  * @param id User id in the system. This can be discarded by using the value 0
  */
-void pcs_t_compute_1of2_ns_protocol(pcs_t_public_key *pk, hcs_random *hr,
-        pcs_t_proof *pf, mpz_t cipher_m, mpz_t cipher_r, unsigned long nth_power,
-        unsigned long id);
+void pcs_t_compute_1of2_ns_protocol(pcs_t_public_key *pk, hcs_random *hr, pcs_t_proof *pf,
+                                    mpz_t cipher_m, mpz_t cipher_r, unsigned long nth_power,
+                                    unsigned long id);
 
 /**
  * Verify a proof and return whether it is an n'th power.
@@ -273,8 +271,7 @@ void pcs_t_compute_1of2_ns_protocol(pcs_t_public_key *pk, hcs_random *hr,
  * @param id User id in the system.
  * @return 0 if not an n'th power, non-zero if it is an n'th power
  */
-int pcs_t_verify_ns_protocol(pcs_t_public_key *pk, pcs_t_proof *pf,
-        unsigned long id);
+int pcs_t_verify_ns_protocol(pcs_t_public_key *pk, pcs_t_proof *pf, unsigned long id);
 
 /**
  * Compute the value for an n^s protocol, limited to 1 of 2 values.
@@ -284,8 +281,8 @@ int pcs_t_verify_ns_protocol(pcs_t_public_key *pk, pcs_t_proof *pf,
  * @param cipher Encrypted value that this proof is meant to verify
  * @param id of the owner of this cipher text
  */
-int pcs_t_verify_1of2_ns_protocol(pcs_t_public_key *pk, pcs_t_proof *pf,
-        mpz_t cipher, unsigned long id);
+int pcs_t_verify_1of2_ns_protocol(pcs_t_public_key *pk, pcs_t_proof *pf, mpz_t cipher,
+                                  unsigned long id);
 
 /**
  * Frees a pcs_t proof object and all values associated with it.
@@ -314,7 +311,7 @@ void pcs_t_free_proof(pcs_t_proof *pf);
  * @param hr A pointer to an initialised hcs_random type
  * @return A polynomial coefficient list on success, else NULL
  */
-pcs_t_polynomial* pcs_t_init_polynomial(pcs_t_private_key *vk, hcs_random *hr);
+pcs_t_polynomial *pcs_t_init_polynomial(pcs_t_private_key *vk, hcs_random *hr);
 
 /**
  * Compute a polynomial P(x) for a given x value in the required finite field.
@@ -326,8 +323,8 @@ pcs_t_polynomial* pcs_t_init_polynomial(pcs_t_private_key *vk, hcs_random *hr);
  * @param rop mpz_t where the result is stored
  * @param x The value to calculate the polynomial at
  */
-void pcs_t_compute_polynomial(pcs_t_private_key *vk, pcs_t_polynomial *px,
-                              mpz_t rop, const unsigned long x);
+void pcs_t_compute_polynomial(pcs_t_private_key *vk, pcs_t_polynomial *px, mpz_t rop,
+                              const unsigned long x);
 
 /**
  * Frees a given polynomial (array of mpz_t values) and all associated data.
@@ -345,7 +342,7 @@ void pcs_t_free_polynomial(pcs_t_polynomial *px);
  * @return A pointer to an initialised pcs_t_auth_server, NULL on allocation
  *         failure
  */
-pcs_t_auth_server* pcs_t_init_auth_server(void);
+pcs_t_auth_server *pcs_t_init_auth_server(void);
 
 /**
  * Set the internal values for the server @p au. @p si is the secret polynomial
@@ -370,8 +367,7 @@ void pcs_t_set_auth_server(pcs_t_auth_server *au, mpz_t si, unsigned long i);
  * @param rop mpz_t where the calculated share is stored
  * @param cipher1 mpz_t which stores the ciphertext to decrypt
  */
-void pcs_t_share_decrypt(pcs_t_public_key *vk, pcs_t_auth_server *au,
-                         mpz_t rop, mpz_t cipher1);
+void pcs_t_share_decrypt(pcs_t_public_key *vk, pcs_t_auth_server *au, mpz_t rop, mpz_t cipher1);
 
 /**
  * Combine an array of shares @p c, storing the result in @p rop.

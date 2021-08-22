@@ -24,10 +24,10 @@ extern "C" {
  * be counted.
  */
 typedef struct {
-    mpz_t *shares;      /**< An array of share values */
-    int *flag;          /**< Flags corresponding to each value in @p shares */
-    void **server_id;   /**< Optional id of each shares server */
-    unsigned long size; /**< Number of shares in this array */
+  mpz_t *shares;      /**< An array of share values */
+  int *flag;          /**< Flags corresponding to each value in @p shares */
+  void **server_id;   /**< Optional id of each shares server */
+  unsigned long size; /**< Number of shares in this array */
 } hcs_shares;
 
 /**
@@ -36,7 +36,7 @@ typedef struct {
  * @param size The number of shares this hcs_shares should store
  * @return A pointer to an initialised hcs_shares, NULL on allocation failure
  */
-hcs_shares* hcs_init_shares(unsigned long size);
+hcs_shares *hcs_init_shares(unsigned long size);
 
 /**
  * Set a share value for the server given by id @p index. @p index should
@@ -97,4 +97,3 @@ void hcs_free_shares(hcs_shares *hs);
 #endif
 
 #endif
-

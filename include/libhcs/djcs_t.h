@@ -16,6 +16,7 @@
 #define HCS_DJCS_T_H
 
 #include <gmp.h>
+
 #include "hcs_random.h"
 
 #ifdef __cplusplus
@@ -26,37 +27,37 @@ extern "C" {
  * Details that a decryption server is required to keep track of.
  */
 typedef struct {
-    unsigned long i;    /**< The server index of this particular instance */
-    mpz_t si;           /**< The polynomial evaluation at @p i */
+  unsigned long i; /**< The server index of this particular instance */
+  mpz_t si;        /**< The polynomial evaluation at @p i */
 } djcs_t_auth_server;
 
 /**
  * Public key for use in the Threshold Damgard-Jurik system.
  */
 typedef struct {
-    unsigned long s; /**< Ciphertext space exponent */
-    mpz_t *n;        /**< Modulus of the key. n = p * q */
-    mpz_t g;         /**< Precomputation: n + 1 usually, may be 2 */
+  unsigned long s; /**< Ciphertext space exponent */
+  mpz_t *n;        /**< Modulus of the key. n = p * q */
+  mpz_t g;         /**< Precomputation: n + 1 usually, may be 2 */
 } djcs_t_public_key;
 
 /**
  * Private key for use in the Threshold Damgard-Jurik system.
  */
 typedef struct {
-    unsigned long s;    /**< Ciphertext space exponent */
-    unsigned long w;    /**< The number of servers req to decrypt */
-    unsigned long l;    /**< The number of decryption servers */
-    mpz_t *vi;          /**< Verification values for the decrypt servers */
-    mpz_t *n;           /**< Modulus; Higher powers are precomputed. Len(n) = s*/
-    mpz_t v;            /**< Cyclic generator of squares in Z*n^2 */
-    mpz_t delta;        /**< Precomputation: l! */
-    mpz_t d;            /**< d = 0 mod m and d = 1 mod n^2 */
-    mpz_t p;            /**< A random prime determined during key generation */
-    mpz_t ph;           /**< A random prime such that p = 2*ph + 1 */
-    mpz_t q;            /**< A random prime determined during key generation */
-    mpz_t qh;           /**< A random prime such that q = 2*qh + 1 */
-    mpz_t m;            /**< Precomputation: ph * qh */
-    mpz_t nsm;          /**< Precomputation: n * m */
+  unsigned long s; /**< Ciphertext space exponent */
+  unsigned long w; /**< The number of servers req to decrypt */
+  unsigned long l; /**< The number of decryption servers */
+  mpz_t *vi;       /**< Verification values for the decrypt servers */
+  mpz_t *n;        /**< Modulus; Higher powers are precomputed. Len(n) = s*/
+  mpz_t v;         /**< Cyclic generator of squares in Z*n^2 */
+  mpz_t delta;     /**< Precomputation: l! */
+  mpz_t d;         /**< d = 0 mod m and d = 1 mod n^2 */
+  mpz_t p;         /**< A random prime determined during key generation */
+  mpz_t ph;        /**< A random prime such that p = 2*ph + 1 */
+  mpz_t q;         /**< A random prime determined during key generation */
+  mpz_t qh;        /**< A random prime such that q = 2*qh + 1 */
+  mpz_t m;         /**< Precomputation: ph * qh */
+  mpz_t nsm;       /**< Precomputation: n * m */
 } djcs_t_private_key;
 
 /**
@@ -66,7 +67,7 @@ typedef struct {
  * @return A pointer to an initialised djcs_t_public_key, NULL on allocation
  *         failure
  */
-djcs_t_public_key* djcs_t_init_public_key(void);
+djcs_t_public_key *djcs_t_init_public_key(void);
 
 /**
  * Initialise a djcs_private_key and return a pointer to the newly created
@@ -75,7 +76,7 @@ djcs_t_public_key* djcs_t_init_public_key(void);
  * @return A pointer to an initialise djcs_t_private_key, NULL on allocation
  *         failure
  */
-djcs_t_private_key* djcs_t_init_private_key(void);
+djcs_t_private_key *djcs_t_init_private_key(void);
 
 /**
  * Initialise a key pair with modulus size @p bits. It is required that @p pk
@@ -97,9 +98,9 @@ djcs_t_private_key* djcs_t_init_private_key(void);
  * this function in this manner, ensure djcs_t_clear_public_key and/or
  * djcs_t_clear_private_key are called prior.
  */
-void djcs_t_generate_key_pair(djcs_t_public_key *pk, djcs_t_private_key *vk,
-        hcs_random *hr, const unsigned long s, const unsigned long bits,
-        const unsigned long l, const unsigned long w);
+void djcs_t_generate_key_pair(djcs_t_public_key *pk, djcs_t_private_key *vk, hcs_random *hr,
+                              const unsigned long s, const unsigned long bits,
+                              const unsigned long l, const unsigned long w);
 
 /**
  * Encrypt a value @p plain1, and set @p rop to the encrypted result.
@@ -109,8 +110,7 @@ void djcs_t_generate_key_pair(djcs_t_public_key *pk, djcs_t_private_key *vk,
  * @param rop mpz_t where the encrypted result is stored
  * @param plain1 mpz_t to be encrypted
  */
-void djcs_t_encrypt(djcs_t_public_key *pk, hcs_random *hr, mpz_t rop,
-                    mpz_t plain1);
+void djcs_t_encrypt(djcs_t_public_key *pk, hcs_random *hr, mpz_t rop, mpz_t plain1);
 
 /**
  * Reencrypt an encrypted value @p op. Upon decryption, this newly
@@ -167,7 +167,7 @@ void djcs_t_ep_mul(djcs_t_public_key *pk, mpz_t rop, mpz_t cipher1, mpz_t plain1
  * @param hr A pointer to an initialised hcs_random type
  * @return A polynomial coefficient list on success, else NULL
  */
-mpz_t* djcs_t_init_polynomial(djcs_t_private_key *vk, hcs_random *hr);
+mpz_t *djcs_t_init_polynomial(djcs_t_private_key *vk, hcs_random *hr);
 
 /**
  * Compute a polynomial P(x) for a given x value in the required finite field.
@@ -199,7 +199,7 @@ void djcs_t_free_polynomial(djcs_t_private_key *vk, mpz_t *coeff);
  * @return A pointer to an initialised djcs_t_auth_server, NULL on allocation
  *         failure
  */
-djcs_t_auth_server* djcs_t_init_auth_server(void);
+djcs_t_auth_server *djcs_t_init_auth_server(void);
 
 /**
  * Set the internal values for the server @p au. @p si is the secret polynomial
@@ -224,8 +224,7 @@ void djcs_t_set_auth_server(djcs_t_auth_server *au, mpz_t si, unsigned long i);
  * @param rop mpz_t where the calculated share is stored
  * @param cipher1 mpz_t which stores the ciphertext to decrypt
  */
-void djcs_t_share_decrypt(djcs_t_private_key *vk, djcs_t_auth_server *au,
-                          mpz_t rop, mpz_t cipher1);
+void djcs_t_share_decrypt(djcs_t_private_key *vk, djcs_t_auth_server *au, mpz_t rop, mpz_t cipher1);
 
 /**
  * Combine an array of shares @p c, storing the result in @p rop.

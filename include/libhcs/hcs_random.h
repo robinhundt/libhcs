@@ -37,7 +37,7 @@ extern "C" {
  * wrapper around a gmp_randstate_t variable.
  */
 typedef struct {
-    gmp_randstate_t rstate; /**< gmp_randstate_t that is used internally */
+  gmp_randstate_t rstate; /**< gmp_randstate_t that is used internally */
 } hcs_random;
 
 /**
@@ -46,7 +46,7 @@ typedef struct {
  *
  * @return A pointer to an hcs_random type on success, NULL on allocation failure
  */
-hcs_random* hcs_init_random(void);
+hcs_random *hcs_init_random(void);
 
 /**
  * Reseed the given hcs_random. If we fail to gather sufficient entropy, we

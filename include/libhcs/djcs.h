@@ -11,6 +11,7 @@
 #define HCS_DJCS_H
 
 #include <gmp.h>
+
 #include "hcs_random.h"
 
 #ifdef __cplusplus
@@ -21,19 +22,19 @@ extern "C" {
  * Public key for use in the Paillier system.
  */
 typedef struct {
-    unsigned long s; /**< Ciphertext space exponent */
-    mpz_t *n;        /**< Modulus. Higher powers are precomputed. Len(n) = s */
-    mpz_t g;         /**< Precomputation: n + 1 */
+  unsigned long s; /**< Ciphertext space exponent */
+  mpz_t *n;        /**< Modulus. Higher powers are precomputed. Len(n) = s */
+  mpz_t g;         /**< Precomputation: n + 1 */
 } djcs_public_key;
 
 /**
  * Private key for use in the Paillier system.
  */
 typedef struct {
-    unsigned long s; /**< Ciphertext space exponent */
-    mpz_t *n;        /**< Modulus; Higher powers are precomputed. Len(n) = s */
-    mpz_t d;         /**< lcm(p, q) where n = p * q */
-    mpz_t mu;        /**< g^d (mod n^(s+1)) */
+  unsigned long s; /**< Ciphertext space exponent */
+  mpz_t *n;        /**< Modulus; Higher powers are precomputed. Len(n) = s */
+  mpz_t d;         /**< lcm(p, q) where n = p * q */
+  mpz_t mu;        /**< g^d (mod n^(s+1)) */
 } djcs_private_key;
 
 /**
@@ -43,7 +44,7 @@ typedef struct {
  * @return A pointer to an initialised djcs_public_key, NULL on allocation
  *         failure
  */
-djcs_public_key*  djcs_init_public_key(void);
+djcs_public_key *djcs_init_public_key(void);
 
 /**
  * Initialise a djcs_private_key and return a pointer to the newly created
@@ -52,7 +53,7 @@ djcs_public_key*  djcs_init_public_key(void);
  * @return A pointer to an initialised djcs_private_key, NULL on allocation
  *         failure
  */
-djcs_private_key* djcs_init_private_key(void);
+djcs_private_key *djcs_init_private_key(void);
 
 /**
  * Initialise a key pair with modulus size @p bits. It is required that @p pk
@@ -80,8 +81,8 @@ djcs_private_key* djcs_init_private_key(void);
  * @param s The size exponent for the ciphertext space we wish to work in
  * @param bits The number of bits for the modulus of the key
  */
-int djcs_generate_key_pair(djcs_public_key *pk, djcs_private_key *vk,
-                           hcs_random *hr, unsigned long s, unsigned long bits);
+int djcs_generate_key_pair(djcs_public_key *pk, djcs_private_key *vk, hcs_random *hr,
+                           unsigned long s, unsigned long bits);
 
 /**
  * Encrypt a value @p plain1, and set @p rop to the encrypted result.
@@ -205,7 +206,7 @@ int djcs_verify_key_pair(djcs_public_key *pk, djcs_private_key *vk);
  * @param pk A pointer to an initialised djcs_public_key
  * @return A string representing the given key, else NULL on error
  */
-char* djcs_export_public_key(djcs_public_key *pk);
+char *djcs_export_public_key(djcs_public_key *pk);
 
 /**
  * Export a private key as a string. We only store the minimum required values
@@ -215,7 +216,7 @@ char* djcs_export_public_key(djcs_public_key *pk);
  * @param vk A pointer to an initialised djcs_private_key
  * @return A string representing the given key, else NULL on error
  */
-char* djcs_export_private_key(djcs_private_key *vk);
+char *djcs_export_private_key(djcs_private_key *vk);
 
 /**
  * Import a public key from a string. The input string is expected to

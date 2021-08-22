@@ -31,7 +31,9 @@ CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 
 # Note: globbing sources is considered bad practice as CMake's generators may not detect new files
 # automatically. Keep that in mind when changing files, or explicitly mention them here.
-file(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp")
+file(GLOB_RECURSE headers CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
+)
 file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 
 # ---- Create library ----
@@ -40,7 +42,7 @@ file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
 # target: add_library(kthRank INTERFACE)
 add_library(hcs ${headers} ${sources})
 
-set_target_properties(hcs PROPERTIES CXX_STANDARD 20 )
+set_target_properties(hcs PROPERTIES CXX_STANDARD 20)
 
 # being a cross-platform target, we enforce standards conformance on MSVC
 target_compile_options(hcs PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->")
@@ -50,7 +52,7 @@ target_link_libraries(hcs PRIVATE gmp gmpxx)
 
 target_include_directories(
   hcs PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-                 $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
+             $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
 )
 
 # ---- Create an installable target ----

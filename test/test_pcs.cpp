@@ -1,15 +1,14 @@
-//#define CATCH_CONFIG_RUNNER
-//#include "catch.hpp"
-//
-//#include <gmpxx.h>
-//#include "../include/libhcs++/pcs.hpp"
+#define CATCH_CONFIG_RUNNER
+#include <gmpxx.h>
+
 #include "../include/libhcs++/pcs_t.hpp"
-//
-//static hcs::random *hr;
-//static hcs::pcs::public_key *pk;
-//static hcs::pcs::private_key *vk;
-//
-//TEST_CASE( "Encryption/Decryption") {
+#include "catch.hpp"
+
+// static hcs::random hr;
+// static hcs::pcs_t::public_key pk;
+// static hcs::pcs_t::private_key vk;
+
+// TEST_CASE( "Encryption/Decryption") {
 //    mpz_class a, b, c, d;
 //
 //    /* Key pair must match */
@@ -82,17 +81,13 @@
 //#undef TEST_REENCRYPT
 //}
 //
-//int main(int argc, char *argv[])
-//{
-//    hr = new hcs::random();
-//    pk = new hcs::pcs::public_key(*hr);
-//    vk = new hcs::pcs::private_key(*hr);
-//    hcs::pcs::generate_key_pair(*pk, *vk, 512);
-//
-//    int result = Catch::Session().run(argc, argv);
-//
-//    delete hr;
-//    delete pk;
-//    delete vk;
-//    return result;
-//}
+int main(int argc, char *argv[]) {
+  //    hr = hcs::random();
+  //    pk = hcs::pcs_t::public_key(hr);
+  //    vk = hcs::pcs_t::private_key(hr);
+  //    hcs::pcs_t::generate_key_pair(pk, vk, 512, 1, 1);
+  //
+  //    int result = Catch::Session().run(argc, argv);
+
+  return 0;
+}

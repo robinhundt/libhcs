@@ -8,28 +8,23 @@
 #define HCS_RANDOM_HPP
 
 #include <memory>
+
 #include "../libhcs/hcs_random.h"
 
 namespace hcs {
 
-class random {
-
-private:
+  class random {
+  private:
     std::shared_ptr<hcs_random> hr;
 
-public:
-    random() : hr(hcs_init_random(), [](auto& ptr) { hcs_free_random(ptr);}) {}
+  public:
+    random() : hr(hcs_init_random(), [](auto& ptr) { hcs_free_random(ptr); }) {}
 
-    int reseed() {
-        return hcs_reseed_random(hr.get());
-    }
+    int reseed() { return hcs_reseed_random(hr.get()); }
 
+    hcs_random* as_ptr() { return hr.get(); }
+  };
 
-    hcs_random* as_ptr() {
-        return hr.get();
-    }
-};
-
-} // hcs namespace
+}  // namespace hcs
 
 #endif

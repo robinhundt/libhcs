@@ -17,6 +17,7 @@
 #define HCS_EGCS_H
 
 #include <gmp.h>
+
 #include "hcs_random.h"
 
 #ifdef __cplusplus
@@ -27,25 +28,25 @@ extern "C" {
  * Ciphertext type for use in the ElGamal scheme.
  */
 typedef struct {
-    mpz_t c1;   /**< First value of egcs cipher */
-    mpz_t c2;   /**< Second value of egcs cipher */
+  mpz_t c1; /**< First value of egcs cipher */
+  mpz_t c2; /**< Second value of egcs cipher */
 } egcs_cipher;
 
 /**
  * Public key for use in the ElGamal scheme.
  */
 typedef struct {
-    mpz_t g;    /**< Generator for the cyclic group */
-    mpz_t q;    /**< Order of the cyclic group */
-    mpz_t h;    /**< g^x in G */
+  mpz_t g; /**< Generator for the cyclic group */
+  mpz_t q; /**< Order of the cyclic group */
+  mpz_t h; /**< g^x in G */
 } egcs_public_key;
 
 /**
  * Private key for use in the ElGamal scheme.
  */
 typedef struct {
-    mpz_t x;    /**< Random value in {1, ..., q-1} */
-    mpz_t q;    /**< Order of the cyclic group */
+  mpz_t x; /**< Random value in {1, ..., q-1} */
+  mpz_t q; /**< Order of the cyclic group */
 } egcs_private_key;
 
 /**
@@ -55,7 +56,7 @@ typedef struct {
  * @return A pointer to an initialised egcs_public_key, NULL on allocation
  *         failure
  */
-egcs_public_key*  egcs_init_public_key(void);
+egcs_public_key *egcs_init_public_key(void);
 
 /**
  * Initialise a egcs_private_key and return a pointer to the newly created
@@ -64,7 +65,7 @@ egcs_public_key*  egcs_init_public_key(void);
  * @return A pointer to an initialised egcs_private_key, NULL on allocation
  *         failure
  */
-egcs_private_key* egcs_init_private_key(void);
+egcs_private_key *egcs_init_private_key(void);
 
 /**
  * Initialise a key pair with modulus size @p bits. It is required that @p pk
@@ -79,8 +80,8 @@ egcs_private_key* egcs_init_private_key(void);
  * @param hr A pointer to an initialised hcs_random type
  * @param bits The number of bits for the modulus of the key
  */
-void egcs_generate_key_pair(egcs_public_key *pk, egcs_private_key *vk,
-                            hcs_random *hr, const unsigned long bits);
+void egcs_generate_key_pair(egcs_public_key *pk, egcs_private_key *vk, hcs_random *hr,
+                            const unsigned long bits);
 
 /**
  * Initialise a egcs_cipher and return a pointer to the newly created
@@ -88,7 +89,7 @@ void egcs_generate_key_pair(egcs_public_key *pk, egcs_private_key *vk,
  *
  * @return A pointer to an initialised egcs_cipher, NULL on allocation failure
  */
-egcs_cipher* egcs_init_cipher(void);
+egcs_cipher *egcs_init_cipher(void);
 
 /**
  * Copy value of op to rop.
@@ -106,8 +107,7 @@ void egcs_set(egcs_cipher *rop, egcs_cipher *op);
  * @param rop egcs_cipher where the result is to be stored
  * @param plain1 mpz_t to be encrypted
  */
-void egcs_encrypt(egcs_public_key *pk, hcs_random *hr, egcs_cipher *rop,
-                  mpz_t plain1);
+void egcs_encrypt(egcs_public_key *pk, hcs_random *hr, egcs_cipher *rop, mpz_t plain1);
 
 /**
  * Multiply an encrypted value @p ct1 with an encrypted value @p ct2, storing
@@ -118,8 +118,7 @@ void egcs_encrypt(egcs_public_key *pk, hcs_random *hr, egcs_cipher *rop,
  * @param ct1 egcs_cipher to be multiplied together
  * @param ct2 egcs_cipher to be multiplied together
  */
-void egcs_ee_mul(egcs_public_key *pk, egcs_cipher *rop, egcs_cipher *ct1,
-        egcs_cipher *ct2);
+void egcs_ee_mul(egcs_public_key *pk, egcs_cipher *rop, egcs_cipher *ct1, egcs_cipher *ct2);
 
 /**
  * Decrypt a value @p cipher1, and set @p rop to the decrypted result.

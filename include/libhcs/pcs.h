@@ -17,6 +17,7 @@
 #define HCS_PCS_H
 
 #include <gmp.h>
+
 #include "hcs_random.h"
 
 #ifdef __cplusplus
@@ -27,25 +28,25 @@ extern "C" {
  * Public key for use in the Paillier system.
  */
 typedef struct {
-    mpz_t n;        /**< Modulus of the key: n = p * q */
-    mpz_t g;        /**< Precomputation: n + 1 usually, be 2*/
-    mpz_t n2;       /**< Precomputation: n^2 */
+  mpz_t n;  /**< Modulus of the key: n = p * q */
+  mpz_t g;  /**< Precomputation: n + 1 usually, be 2*/
+  mpz_t n2; /**< Precomputation: n^2 */
 } pcs_public_key;
 
 /**
  * Private key for use in the Paillier system.
  */
 typedef struct {
-    mpz_t p;        /**< A random prime determined during key generation */
-    mpz_t q;        /**< A random prime determined during key generation */
-    mpz_t p2;       /**< Precomputation: p^2 */
-    mpz_t q2;       /**< Precomputation: q^2 */
-    mpz_t hp;       /**< Precomputation: L_p(g^{p-1} mod p^2)^{-1} mod p */
-    mpz_t hq;       /**< Precomputation: L_p(g^{q-1} mod q^2)^{-1} mod q */
-    mpz_t lambda;   /**< Precomputation: euler-phi(p, q) */
-    mpz_t mu;       /**< Precomputation: lambda^{-1} mod n */
-    mpz_t n;        /**< Precomputation: p * q */
-    mpz_t n2;       /**< Precomputation: n^2 */
+  mpz_t p;      /**< A random prime determined during key generation */
+  mpz_t q;      /**< A random prime determined during key generation */
+  mpz_t p2;     /**< Precomputation: p^2 */
+  mpz_t q2;     /**< Precomputation: q^2 */
+  mpz_t hp;     /**< Precomputation: L_p(g^{p-1} mod p^2)^{-1} mod p */
+  mpz_t hq;     /**< Precomputation: L_p(g^{q-1} mod q^2)^{-1} mod q */
+  mpz_t lambda; /**< Precomputation: euler-phi(p, q) */
+  mpz_t mu;     /**< Precomputation: lambda^{-1} mod n */
+  mpz_t n;      /**< Precomputation: p * q */
+  mpz_t n2;     /**< Precomputation: n^2 */
 } pcs_private_key;
 
 /**
@@ -55,7 +56,7 @@ typedef struct {
  * @return A pointer to an initialised pcs_public_key, NULL on allocation
  *         failure
  */
-pcs_public_key*  pcs_init_public_key(void);
+pcs_public_key *pcs_init_public_key(void);
 
 /**
  * Initialise a pcs_private_key and return a pointer to the newly created
@@ -64,7 +65,7 @@ pcs_public_key*  pcs_init_public_key(void);
  * @return A pointer to an initialised pcs_private_key, NULL on allocation
  *         failure
  */
-pcs_private_key* pcs_init_private_key(void);
+pcs_private_key *pcs_init_private_key(void);
 
 /**
  * Initialise a key pair with modulus size @p bits. It is required that @p pk
@@ -86,8 +87,8 @@ pcs_private_key* pcs_init_private_key(void);
  * @param hr A pointer to an initialised hcs_random type
  * @param bits The number of bits for the modulus of the key
  */
-void pcs_generate_key_pair(pcs_public_key *pk, pcs_private_key *vk,
-                           hcs_random *hr, const unsigned long bits);
+void pcs_generate_key_pair(pcs_public_key *pk, pcs_private_key *vk, hcs_random *hr,
+                           const unsigned long bits);
 
 /**
  * Encrypt a value @p plain1, and set @p rop to the encrypted result.
@@ -231,7 +232,7 @@ int pcs_verify_key_pair(pcs_public_key *pk, pcs_private_key *vk);
  * @param pk A pointer to an initialised pcs_public_key
  * @return A string representing the given key, else NULL on error
  */
-char* pcs_export_public_key(pcs_public_key *pk);
+char *pcs_export_public_key(pcs_public_key *pk);
 
 /**
  * Export a private key as a string. We only store the minimum required values
@@ -241,7 +242,7 @@ char* pcs_export_public_key(pcs_public_key *pk);
  * @param vk A pointer to an initialised pcs_private_key
  * @return A string representing the given key, else NULL on error
  */
-char* pcs_export_private_key(pcs_private_key *vk);
+char *pcs_export_private_key(pcs_private_key *vk);
 
 /**
  * Import a public key from a string. The input string is expected to

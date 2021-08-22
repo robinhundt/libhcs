@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 project(hcsTests LANGUAGES CXX)
 
-set(TEST_DIR    "test/")
-set(BINARY_DIR  "bin/")
+set(TEST_DIR "test/")
+set(BINARY_DIR "bin/")
 
 # ---- Options ----
 
@@ -17,7 +17,7 @@ include(../cmake/tools.cmake)
 # ---- Dependencies ----
 
 include(../cmake/CPM.cmake)
-
+CPMAddPackage("gh:TheLartians/Format.cmake@1.7.0")
 
 if(TEST_INSTALLED_VERSION)
   find_package(hcs REQUIRED)
