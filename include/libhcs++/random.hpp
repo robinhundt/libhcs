@@ -7,6 +7,7 @@
 #ifndef HCS_RANDOM_HPP
 #define HCS_RANDOM_HPP
 
+#include <memory>
 #include "../libhcs/hcs_random.h"
 
 namespace hcs {
@@ -14,36 +15,18 @@ namespace hcs {
 class random {
 
 private:
-    hcs_random *hr;
-    int refcount;   // Counts the number of times this particular instance is counted
+    std::shared_ptr<hcs_random> hr;
 
 public:
-    random() : refcount(0) {
-        hr = hcs_init_random();
-    }
-
-    ~random() {
-        hcs_free_random(hr);
-    }
+    random() : hr(hcs_init_random(), [](auto& ptr) { hcs_free_random(ptr);}) {}
 
     int reseed() {
-        return hcs_reseed_random(hr);
+        return hcs_reseed_random(hr.get());
     }
 
-    void inc_refcount() {
-        refcount++;
-    }
-
-    bool dec_refcount() {
-        return refcount > 0 ? --refcount != 0 : false;
-    }
-
-    bool is_referenced() {
-        return refcount != 0;
-    }
 
     hcs_random* as_ptr() {
-        return hr;
+        return hr.get();
     }
 };
 

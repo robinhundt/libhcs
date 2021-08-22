@@ -20,77 +20,58 @@
 
 #include <vector>
 #include <gmpxx.h>
+#include <memory>
 #include "../libhcs/pcs_t.h"
-#include "hcs_shares.hpp"
+#include "shares.hpp"
 #include "random.hpp"
 
-namespace hcs {
-namespace pcs_t {
+namespace hcs::pcs_t {
 
 class public_key {
 
 private:
-    pcs_t_public_key *pk;
-    hcs::random *hr;
+    std::shared_ptr<pcs_t_public_key> pk;
+    hcs::random hr;
 
 public:
-    explicit public_key(hcs::random &hr_) {
-        pk = pcs_t_init_public_key();
-        hr = &hr_;
-        hr->inc_refcount();
-    }
-
-    // delete copy constructor because it can result in double free
-    public_key(const public_key&) = delete;
-
-    public_key(public_key&& other) noexcept : pk(other.pk), hr(other.hr) {
-        other.pk = nullptr;
-        other.hr = nullptr;
-    }
-
-    ~public_key() {
-        if (pk != nullptr) {
-            pcs_t_free_public_key(pk);
-            hr->dec_refcount();
-        }
-    }
+    explicit public_key(hcs::random &hr): pk(pcs_t_init_public_key(), [](auto& ptr){ pcs_t_free_public_key(ptr);}), hr(hr) {}
 
     pcs_t_public_key* as_ptr() {
-        return pk;
+        return pk.get();
     }
 
-    hcs::random* get_rand() {
+    hcs::random get_rand() {
         return hr;
     }
 
     /* Encryption functions acting on a key */
     mpz_class encrypt(mpz_class &op) {
         mpz_class rop;
-        pcs_t_encrypt(pk, hr->as_ptr(), rop.get_mpz_t(), op.get_mpz_t());
+        pcs_t_encrypt(pk.get(), hr.as_ptr(), rop.get_mpz_t(), op.get_mpz_t());
         return rop;
     }
 
     mpz_class reencrypt(mpz_class &op) {
         mpz_class rop;
-        pcs_t_reencrypt(pk, hr->as_ptr(), rop.get_mpz_t(), op.get_mpz_t());
+        pcs_t_reencrypt(pk.get(), hr.as_ptr(), rop.get_mpz_t(), op.get_mpz_t());
         return rop;
     }
 
     mpz_class ep_add(mpz_class &c1, mpz_class &c2) {
         mpz_class rop;
-        pcs_t_ep_add(pk, rop.get_mpz_t(), c1.get_mpz_t(), c2.get_mpz_t());
+        pcs_t_ep_add(pk.get(), rop.get_mpz_t(), c1.get_mpz_t(), c2.get_mpz_t());
         return rop;
     }
 
     mpz_class ee_add(mpz_class &c1, mpz_class &c2) {
         mpz_class rop;
-        pcs_t_ee_add(pk, rop.get_mpz_t(), c1.get_mpz_t(), c2.get_mpz_t());
+        pcs_t_ee_add(pk.get(), rop.get_mpz_t(), c1.get_mpz_t(), c2.get_mpz_t());
         return rop;
     }
 
     mpz_class ep_mul(mpz_class &c1, mpz_class &p1) {
         mpz_class rop;
-        pcs_t_ep_mul(pk, rop.get_mpz_t(), c1.get_mpz_t(), p1.get_mpz_t());
+        pcs_t_ep_mul(pk.get(), rop.get_mpz_t(), c1.get_mpz_t(), p1.get_mpz_t());
         return rop;
     }
 
@@ -99,95 +80,87 @@ public:
     // they require a set size and we can enforce that through some function
     mpz_class share_combine(hcs::shares &shares) {
         mpz_class rop;
-        pcs_t_share_combine(pk, rop.get_mpz_t(), shares.as_ptr());
+        pcs_t_share_combine(pk.get(), rop.get_mpz_t(), shares.as_ptr());
         return rop;
     }
 
     void clear() {
-        pcs_t_clear_public_key(pk);
+        pcs_t_clear_public_key(pk.get());
     }
 };
 
 class private_key {
 
 private:
-    pcs_t_private_key *vk;
-    hcs::random *hr;
+    std::shared_ptr<pcs_t_private_key> vk;
+    hcs::random hr;
 
 public:
-    explicit private_key(hcs::random &hr_) {
-        vk = pcs_t_init_private_key();
-        hr = &hr_;
-        hr->inc_refcount();
-    }
+    explicit private_key(hcs::random &hr): vk(pcs_t_init_private_key(), [](auto& ptr) { pcs_t_free_private_key(ptr);}), hr(hr) {}
 
-    // delete copy constructor because it can result in double free
-    private_key(const private_key&) = delete;
+//    // delete copy constructor because it can result in double free
+//    private_key(const private_key&) = delete;
+//
+//    private_key(private_key&& other) noexcept : vk(other.vk), hr(other.hr) {
+//        other.vk = nullptr;
+//        other.hr = nullptr;
+//    }
 
-    private_key(private_key&& other) noexcept : vk(other.vk), hr(other.hr) {
-        other.vk = nullptr;
-        other.hr = nullptr;
-    }
-
-    ~private_key() {
-        if (vk != nullptr) {
-            pcs_t_free_private_key(vk);
-            hr->dec_refcount();
-        }
-    }
+//    ~private_key() {
+//        if (vk != nullptr) {
+//            pcs_t_free_private_key(vk);
+//            hr->dec_refcount();
+//        }
+//    }
 
     pcs_t_private_key* as_ptr() {
-        return vk;
+        return vk.get();
     }
 
-    hcs::random* get_rand() {
+    hcs::random get_rand() const {
         return hr;
     }
 
     void clear() {
-        pcs_t_clear_private_key(vk);
+        pcs_t_clear_private_key(vk.get());
     }
 };
 
 class polynomial {
 
 private:
-    pcs_t_polynomial *px;
-    hcs::random *hr;
+    hcs::random hr;
+    std::shared_ptr<pcs_t_polynomial> px;
 
 public:
-    explicit polynomial(hcs::pcs_t::private_key &pk) {
-        hr = pk.get_rand();
-        px = pcs_t_init_polynomial(pk.as_ptr(), hr->as_ptr());
-        hr->inc_refcount();
-    }
+    explicit polynomial(private_key& pk): hr(pk.get_rand()), px(pcs_t_init_polynomial(pk.as_ptr(), hr.as_ptr()), [](auto& ptr) { pcs_t_free_polynomial(ptr);}) {}
 
-    // delete copy constructor because it can result in double free
-    polynomial(const polynomial&) = delete;
-
-    polynomial(polynomial&& other) noexcept : px(other.px), hr(other.hr) {
-        other.px = nullptr;
-        other.hr = nullptr;
-    }
-
-    ~polynomial() {
-        if (px != nullptr) {
-            pcs_t_free_polynomial(px);
-            hr->dec_refcount();
-        }
-    }
+//    // delete copy constructor because it can result in double free
+//    polynomial(const polynomial&) = delete;
+//
+//    polynomial(polynomial&& other) noexcept : px(other.px), hr(other.hr) {
+//        other.px = nullptr;
+//        other.hr = nullptr;
+//    }
+//
+//    ~polynomial() {
+//        if (px != nullptr) {
+//            pcs_t_free_polynomial(px);
+//            hr->dec_refcount();
+//        }
+//    }
 
     pcs_t_polynomial* as_ptr() {
-        return px;
+        return px.get();
     }
 
-    hcs::random* get_rand() {
+    hcs::random get_rand() {
         return hr;
     }
 
     mpz_class compute(pcs_t::private_key &vk, const unsigned long x) {
         mpz_class rop;
-        pcs_t_compute_polynomial(vk.as_ptr(), px, rop.get_mpz_t(), x);
+        pcs_t_compute_polynomial(vk.as_ptr(), px.get(), rop.get_mpz_t(), x);
         return rop;
     }
 };
@@ -195,34 +168,33 @@ public:
 class auth_server {
 
 private:
-    pcs_t_auth_server *au;
+    std::shared_ptr<pcs_t_auth_server> au;
 
 public:
-    auth_server(mpz_class &op, unsigned long id) {
-        au = pcs_t_init_auth_server();
-        pcs_t_set_auth_server(au, op.get_mpz_t(), id);
+    auth_server(mpz_class &op, unsigned long id): au(pcs_t_init_auth_server(), [](auto& ptr) { pcs_t_free_auth_server(ptr);}) {
+        pcs_t_set_auth_server(au.get(), op.get_mpz_t(), id);
     }
 
     // delete copy constructor because it can result in double free
-    auth_server(const auth_server&) = delete;
-
-    auth_server(auth_server&& other) noexcept : au(other.au) {
-        other.au = nullptr;
-    }
-
-    ~auth_server() {
-        if (au != nullptr) {
-            pcs_t_free_auth_server(au);
-        }
-    }
+//    auth_server(const auth_server&) = delete;
+//
+//    auth_server(auth_server&& other) noexcept : au(other.au) {
+//        other.au = nullptr;
+//    }
+//
+//    ~auth_server() {
+//        if (au != nullptr) {
+//            pcs_t_free_auth_server(au);
+//        }
+//    }
 
     pcs_t_auth_server *as_ptr() {
-        return au;
+        return au.get();
     }
 
     mpz_class share_decrypt(public_key &pk, mpz_class &cipher1) {
         mpz_class rop;
-        pcs_t_share_decrypt(pk.as_ptr(), au, rop.get_mpz_t(),
+        pcs_t_share_decrypt(pk.as_ptr(), au.get(), rop.get_mpz_t(),
                 cipher1.get_mpz_t());
         return rop;
     }
@@ -231,7 +203,7 @@ public:
 inline void generate_key_pair(public_key &pk, private_key &vk,
         const unsigned long bits, const unsigned long l, const unsigned long w)
 {
-    pcs_t_generate_key_pair(pk.as_ptr(), vk.as_ptr(), vk.get_rand()->as_ptr(),
+    pcs_t_generate_key_pair(pk.as_ptr(), vk.as_ptr(), vk.get_rand().as_ptr(),
                             bits, w, l);
 }
 
@@ -239,7 +211,6 @@ inline int verify_key_pair(public_key &pk, private_key &vk) {
     return pcs_t_verify_key_pair(pk.as_ptr(), vk.as_ptr());
 }
 
-}
 }
 
 #endif
